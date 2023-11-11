@@ -14,13 +14,16 @@ public class examen : MonoBehaviour
     private List<GameObject> lastInstances = new List<GameObject>();
     private float cuantosmas;
     private float cuantosmenos;
-    private float originalXPosition; // Almacena la posición original en el eje X del ControladorExamen
+    private float originalXPosition;
     private float originalYPosition;
-    private float paraAbajo = 1f;
+    private float paraAbajo = 0.7f; // Distancia hacia abajo entre filas
+    private float paraDerecha = 1f; // Distancia hacia la derecha entre objetos
+    private int objetosPorFila = 10; // Número de objetos por fila
     private bool bajo = false;
+
     public void Start()
     {
-        originalXPosition = ControladorExamen.position.x; // Almacena la posición original en el eje X
+        originalXPosition = ControladorExamen.position.x;
         originalYPosition = ControladorExamen.position.y;
     }
 
@@ -44,31 +47,21 @@ public class examen : MonoBehaviour
             {
                 int lastIndex = lastInstances.Count - 1;
                 GameObject lastInstance = lastInstances[lastIndex];
-                Destroy(lastInstance); // Destruye la última instancia
-                ControladorExamen.position -= new Vector3(1f,0f,0f); // Retrocede la posición
-                lastInstances.RemoveAt(lastIndex); // Elimina la referencia de la lista
+                Destroy(lastInstance);
+                lastInstances.RemoveAt(lastIndex);
             }
         }
         if (unomas)
         {
-            if (localValue%10==0){
             for (int i = 0; i < cuantosmas; i++)
             {
-                ControladorExamen.position = new Vector3(originalXPosition,0f,0f);
-                ControladorExamen.position -= new Vector3(0f,1f,0f);
-                // Instancia el objeto Examen en la posición actual
-                GameObject newInstance = Instantiate(Examen, ControladorExamen.position, Quaternion.identity);
-                lastInstances.Add(newInstance); // Agrega la nueva instancia a la lista
-            }
-            }
-            else {
-                for (int i = 0; i < cuantosmas; i++)
-            {
-                 // Instancia el objeto Examen en la posición actual
-                GameObject newInstance = Instantiate(Examen, ControladorExamen.position, Quaternion.identity);
-                ControladorExamen.position += new Vector3(1f,0f,0f);
-                lastInstances.Add(newInstance); // Agrega la nueva instancia a la lista
-            }
+                // Calcula la posición en función del número actual de instancias
+                Vector3 nuevaPosicion = new Vector3(originalXPosition + (lastInstances.Count % objetosPorFila) * paraDerecha,
+                                                  originalYPosition - (lastInstances.Count / objetosPorFila) * paraAbajo,
+                                                  0f);
+
+                GameObject nuevaInstancia = Instantiate(Examen, nuevaPosicion, Quaternion.identity);
+                lastInstances.Add(nuevaInstancia);
             }
             unomas = false;
         }
